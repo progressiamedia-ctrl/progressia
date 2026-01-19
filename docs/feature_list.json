@@ -1,0 +1,800 @@
+{
+  "project": "Progressia",
+  "version": "1.0",
+  "created": "2026-01-19",
+  "totalFeatures": 15,
+  "features": [
+    {
+      "id": "F001",
+      "name": "User Onboarding (Demo Lesson Before Signup)",
+      "category": "core",
+      "priority": "P0",
+      "day": 1,
+      "status": "pending",
+      "route": "/welcome",
+      "description": "New users experience a 2-3 minute demo lesson before being asked to create an account. This demonstrates value upfront and creates motivation to save progress by signing up.",
+      "acceptanceCriteria": [
+        "Welcome screen shows brand message and CTA",
+        "Intro slides can be swiped or skipped",
+        "Track selection saves temporarily (not committed until signup)",
+        "Demo lesson is fully functional (cards + quiz)",
+        "Quiz feedback is immediate and educational",
+        "Progress preview shows accurate XP, streak, level",
+        "Signup prompt explains progress will be lost if user exits",
+        "All three auth methods (Google, Apple, Email) work",
+        "After signup, user sees their demo progress saved in /home",
+        "If user exits before signup, progress is lost (localStorage cleared)"
+      ],
+      "testSteps": [
+        "Navigate to / (root)",
+        "Verify welcome screen appears",
+        "Click 'Empezar'",
+        "Swipe through 3 intro slides",
+        "Select 'Trading' preference",
+        "Complete demo lesson (view cards, answer questions)",
+        "Verify immediate feedback on quiz answers",
+        "See progress preview screen",
+        "Click signup option (test with email)",
+        "Verify account created and redirected to /home",
+        "Confirm demo progress appears in profile"
+      ],
+      "states": {
+        "loading": "Skeleton loader while demo lesson loads",
+        "empty": "N/A (first-time users always see onboarding)",
+        "success": "Progress preview shows XP/streak/level, signup prompt appears",
+        "error": "Could not load demo lesson. Please refresh. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "Email (if email signup)",
+          "rule": "Valid email format, unique",
+          "errorMessage": "Please enter a valid email address / Email already registered"
+        },
+        {
+          "field": "Password (if email signup)",
+          "rule": "Min 8 characters",
+          "errorMessage": "Password must be at least 8 characters"
+        },
+        {
+          "field": "Track selection",
+          "rule": "One option required",
+          "errorMessage": "Please select what interests you"
+        }
+      ]
+    },
+    {
+      "id": "F002",
+      "name": "Google & Apple Sign-In",
+      "category": "core",
+      "priority": "P0",
+      "day": 1,
+      "status": "pending",
+      "route": "/signup, /login",
+      "description": "Users can sign up and log in using Google or Apple OAuth. This reduces friction and increases conversion by eliminating manual email/password entry.",
+      "acceptanceCriteria": [
+        "Google OAuth button visible and functional",
+        "Apple OAuth button visible and functional",
+        "OAuth popup/redirect works on mobile and desktop",
+        "New users: account created, DailyStreak and Ranking initialized",
+        "Existing users: logged in directly",
+        "User display_name populated from OAuth provider (first name or email)",
+        "User redirected to /home after successful auth",
+        "Error shown if OAuth fails or user denies permission",
+        "Session stored in httpOnly cookie (7 days)"
+      ],
+      "testSteps": [
+        "Navigate to /signup",
+        "Click 'Sign up with Google'",
+        "Authenticate with Google account",
+        "Verify redirected to /home",
+        "Check user record created in database",
+        "Log out",
+        "Navigate to /login",
+        "Click 'Sign in with Google'",
+        "Verify logged in and redirected to /home",
+        "Repeat for Apple Sign-In"
+      ],
+      "states": {
+        "loading": "Signing in... (spinner while OAuth processes)",
+        "empty": "N/A",
+        "success": "Redirect to /home, user authenticated",
+        "error": "Could not sign in with [Provider]. Please try again. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "OAuth token",
+          "rule": "Valid token from provider",
+          "errorMessage": "Authentication failed. Please try again."
+        }
+      ]
+    },
+    {
+      "id": "F003",
+      "name": "Email/Password Authentication",
+      "category": "core",
+      "priority": "P0",
+      "day": 1,
+      "status": "pending",
+      "route": "/signup, /login",
+      "description": "Users can sign up and log in using email and password as an alternative to OAuth. This provides access for users who prefer not to use Google/Apple or don't have accounts with those providers.",
+      "acceptanceCriteria": [
+        "Email/password form validates on submit",
+        "Password minimum 8 characters enforced",
+        "Email uniqueness enforced (show error if exists)",
+        "Password and confirm password must match",
+        "Account created in Supabase Auth",
+        "DailyStreak and Ranking initialized for new users",
+        "User redirected to /home after signup",
+        "Login form authenticates existing users",
+        "Session stored in httpOnly cookie (7 days)",
+        "Forgot password link present (triggers Supabase password reset email)"
+      ],
+      "testSteps": [
+        "Navigate to /signup",
+        "Click 'Sign up with Email'",
+        "Enter valid email and password (8+ chars)",
+        "Confirm password matches",
+        "Submit form",
+        "Verify account created",
+        "Verify redirected to /home",
+        "Log out",
+        "Navigate to /login",
+        "Enter same email/password",
+        "Verify logged in and redirected to /home"
+      ],
+      "states": {
+        "loading": "Creating account... / Signing in... (spinner)",
+        "empty": "Clean form with placeholder text",
+        "success": "Redirect to /home",
+        "error": "Inline errors per field, general error at top if server fails"
+      },
+      "validationRules": [
+        {
+          "field": "Email",
+          "rule": "Required, valid format, unique",
+          "errorMessage": "Email is required / Please enter a valid email / Email already registered"
+        },
+        {
+          "field": "Password",
+          "rule": "Required, min 8 chars",
+          "errorMessage": "Password is required / Password must be at least 8 characters"
+        },
+        {
+          "field": "Confirm Password",
+          "rule": "Must match password",
+          "errorMessage": "Passwords do not match"
+        }
+      ]
+    },
+    {
+      "id": "F004",
+      "name": "Home Screen - Today's Lesson",
+      "category": "core",
+      "priority": "P0",
+      "day": 2,
+      "status": "pending",
+      "route": "/home",
+      "description": "The Home screen is the primary entry point after login. It displays 'Today's Lesson' prominently, shows daily progress, current streak with fire icon, and a large 'Empezar' or 'Continuar' button. This eliminates decision paralysis and guides users to their next action.",
+      "acceptanceCriteria": [
+        "Home screen loads in under 2 seconds",
+        "Today's lesson auto-selected based on user's track and progress",
+        "Lesson card shows: title, subtitle, estimated minutes, difficulty badge",
+        "Daily progress accurately reflects: not started, in progress, or completed",
+        "Streak displays current count with fire emoji",
+        "CTA button changes text: 'Empezar' vs 'Continuar'",
+        "If lesson already completed today (FREE user), show 'Vuelve mañana' message",
+        "PRO users can click 'Siguiente lección' even after completing daily lesson",
+        "If user has no active track selected, prompt to choose track",
+        "Loading state shows skeleton cards"
+      ],
+      "testSteps": [
+        "Log in as new user (Day 1, no lessons completed)",
+        "Verify Home shows first lesson (Level 1, Order 1) from preferred track",
+        "Verify progress shows '0%'",
+        "Verify streak shows 'Día 0' or 'Día 1'",
+        "Click 'Empezar'",
+        "Verify navigates to /lesson/[slug]",
+        "Return to /home (without completing)",
+        "Verify CTA now says 'Continuar'",
+        "Complete lesson",
+        "Return to /home",
+        "Verify progress shows 'Completada'"
+      ],
+      "states": {
+        "loading": "Skeleton loader for lesson card, progress, streak",
+        "empty": "Selecciona tu ruta de aprendizaje (if no track chosen)",
+        "success": "Lesson card, progress, streak, CTA displayed",
+        "error": "No se pudo cargar tu lección. Intenta de nuevo. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "User track",
+          "rule": "Must have preferred_track set",
+          "errorMessage": "Selecciona tu ruta de aprendizaje primero"
+        }
+      ]
+    },
+    {
+      "id": "F005",
+      "name": "Lesson Viewer - Cards & Content",
+      "category": "core",
+      "priority": "P0",
+      "day": 2,
+      "status": "pending",
+      "route": "/lesson/[slug]",
+      "description": "The Lesson Viewer displays educational content as a series of cards (concept, example, tip, warning, visual). Users swipe or click 'Siguiente' to progress through cards. This breaks learning into digestible chunks and maintains engagement.",
+      "acceptanceCriteria": [
+        "Lesson title, subtitle, estimated time displayed at top",
+        "Progress bar shows current card / total cards",
+        "Cards render correctly: text, images, icons",
+        "'Siguiente' button advances to next card",
+        "'Guardar' bookmarks lesson for later review",
+        "'No entendí' marks lesson for review (sets needs_review flag)",
+        "Swipe gestures work on mobile (left = next, right = previous)",
+        "Last card transitions automatically to quiz",
+        "Exit button prompts confirmation: '¿Quieres salir? Tu progreso se guardará.'",
+        "UserProgress.cards_viewed increments correctly"
+      ],
+      "testSteps": [
+        "Navigate to /lesson/nivel-1-introduccion-finanzas-01",
+        "Verify lesson title and subtitle appear",
+        "Verify progress bar shows '1 / 5' (example)",
+        "Read first card",
+        "Click 'Siguiente'",
+        "Verify progress bar updates to '2 / 5'",
+        "Continue through all cards",
+        "Verify after last card, quiz loads automatically",
+        "Test 'Guardar' button (lesson saved to bookmarks)",
+        "Test 'No entendí' button (needs_review flag set)"
+      ],
+      "states": {
+        "loading": "Skeleton loader for lesson content",
+        "empty": "N/A (lessons always have cards)",
+        "success": "Cards display, progress updates",
+        "error": "No se pudo cargar la lección. Intenta de nuevo. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "Lesson slug",
+          "rule": "Must exist in database",
+          "errorMessage": "Lección no encontrada (404)"
+        }
+      ]
+    },
+    {
+      "id": "F006",
+      "name": "Practice Quiz with Immediate Feedback",
+      "category": "core",
+      "priority": "P0",
+      "day": 2,
+      "status": "pending",
+      "route": "/lesson/[slug]/practice",
+      "description": "After viewing lesson cards, users complete a practice quiz (3-10 questions). Each question shows immediate feedback: if correct, show explanation + reinforcement; if incorrect, show explanation + example + 'intentar de nuevo' option. Users must score 70% to pass.",
+      "acceptanceCriteria": [
+        "Quiz loads after final lesson card",
+        "Questions display one at a time",
+        "Answer options are clickable/tappable",
+        "Immediate feedback shown after each answer",
+        "Correct answers: show explanation, 'Siguiente pregunta'",
+        "Incorrect answers: show explanation + example, allow retry",
+        "Progress bar shows question X of Y",
+        "Final score calculated as percentage",
+        "If score ≥70%: mark lesson as passed, award XP",
+        "If score <70%: show retry options (quiz or review cards)",
+        "UserProgress.quiz_score and quiz_attempts saved"
+      ],
+      "testSteps": [
+        "Complete all cards in a lesson",
+        "Verify quiz loads automatically",
+        "Answer first question correctly",
+        "Verify green checkmark and explanation appear",
+        "Click 'Siguiente pregunta'",
+        "Answer next question incorrectly",
+        "Verify red X and explanation appear",
+        "Click 'Intentar de nuevo'",
+        "Select correct answer",
+        "Complete all questions",
+        "Verify final score displayed",
+        "If ≥70%, verify XP awarded and lesson marked complete"
+      ],
+      "states": {
+        "loading": "Skeleton loader while quiz loads",
+        "empty": "N/A (quizzes always have questions)",
+        "success": "Quiz complete, score ≥70%, XP awarded",
+        "error": "No se pudo cargar la práctica. Intenta de nuevo. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "Answer selection",
+          "rule": "Must select one option",
+          "errorMessage": "Selecciona una respuesta para continuar"
+        },
+        {
+          "field": "Passing score",
+          "rule": "≥70%",
+          "errorMessage": "Necesitas al menos 70% para aprobar"
+        }
+      ]
+    },
+    {
+      "id": "F007",
+      "name": "Lesson Completion & Rewards",
+      "category": "core",
+      "priority": "P0",
+      "day": 3,
+      "status": "pending",
+      "route": "/lesson/[slug]/complete",
+      "description": "After passing the quiz (≥70%), users see a celebration screen showing XP earned, streak updated, level progress, and any unlocked achievements. FREE users also see one short ad (5-10 sec) after the celebration, followed by daily spin opportunity.",
+      "acceptanceCriteria": [
+        "Completion screen shows immediately after quiz pass",
+        "XP calculation correct: base + streak bonus",
+        "Coins awarded and displayed",
+        "Level progress bar animates to new percentage",
+        "Streak increments if lesson completed on new day",
+        "Achievements unlocked if criteria met (e.g., 'First Lesson', '3-Day Streak')",
+        "FREE users see ad after completion (not before or during lesson)",
+        "Ad skippable after 5 seconds",
+        "Daily spin button appears after ad (or immediately for PRO)",
+        "UserProgress marked as completed, is_passed = true",
+        "DailyStreak.current_streak and last_activity_date updated"
+      ],
+      "testSteps": [
+        "Complete lesson with ≥70% quiz score",
+        "Verify completion screen appears",
+        "Verify XP displayed (e.g., '+15 XP')",
+        "Verify level progress bar updates",
+        "Verify streak shows correct count",
+        "If FREE user, verify ad plays",
+        "Skip ad after 5 seconds",
+        "Verify daily spin button appears",
+        "Spin wheel",
+        "Verify reward awarded",
+        "Click 'Ver mi progreso'",
+        "Verify profile shows updated XP, streak, lesson count"
+      ],
+      "states": {
+        "loading": "Guardando tu progreso... (spinner)",
+        "empty": "N/A",
+        "success": "Celebration screen, rewards displayed",
+        "error": "No se pudo guardar tu progreso. Reconectando... (with auto-retry)"
+      },
+      "validationRules": [
+        {
+          "field": "Quiz score",
+          "rule": "Must be ≥70% to reach this screen",
+          "errorMessage": "N/A (enforced earlier)"
+        }
+      ]
+    },
+    {
+      "id": "F008",
+      "name": "Daily Spin / Ruleta",
+      "category": "core",
+      "priority": "P1",
+      "day": 3,
+      "status": "pending",
+      "route": "/spin (or modal on /home)",
+      "description": "Users can spin a reward wheel once per day (FREE) or three times per day (PRO). The wheel awards random rewards: XP boosts, coins, streak freezes, or badges. PRO users have better odds for rare/epic rewards.",
+      "acceptanceCriteria": [
+        "Wheel displays with reward segments (XP, coins, badges, etc.)",
+        "Spin animation smooth and realistic",
+        "Reward probabilities differ: FREE (lower odds for rare) vs PRO (higher odds for rare)",
+        "Reward correctly awarded to UserReward table",
+        "DailySpinLog updated: spins_used increments",
+        "If all spins used, show 'Vuelve mañana' message",
+        "Streak freeze reward (PRO) adds to DailyStreak.streak_freeze_count",
+        "XP boost immediately adds to user's total XP",
+        "Modal closes after reward claimed"
+      ],
+      "testSteps": [
+        "Complete a lesson as FREE user",
+        "Click 'Gira la ruleta'",
+        "Verify wheel displays",
+        "Click 'Girar'",
+        "Verify animation plays",
+        "Verify reward awarded and message shown",
+        "Check DailySpinLog: spins_used = 1, spins_available = 0",
+        "Try to spin again",
+        "Verify 'Vuelve mañana' message",
+        "Test as PRO user: verify 3 spins available"
+      ],
+      "states": {
+        "loading": "Cargando ruleta... (while wheel loads)",
+        "empty": "No tienes giros disponibles. Vuelve mañana.",
+        "success": "Reward awarded, message displayed",
+        "error": "No pudimos cargar la ruleta. Intenta de nuevo. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "Spins available",
+          "rule": "Must have spins_available > 0",
+          "errorMessage": "No tienes giros disponibles hoy"
+        }
+      ]
+    },
+    {
+      "id": "F009",
+      "name": "User Profile & Progress Dashboard",
+      "category": "core",
+      "priority": "P1",
+      "day": 3,
+      "status": "pending",
+      "route": "/profile",
+      "description": "The Profile screen displays user's learning stats: total XP, current streak, longest streak, lessons completed, achievements/badges, learning history, and progress by route (Trading vs Finanzas). All data is private by default.",
+      "acceptanceCriteria": [
+        "Profile loads in under 2 seconds",
+        "All stats accurately reflect database values",
+        "Display name shown (editable via settings icon)",
+        "Total XP and current level displayed",
+        "Current streak and longest streak shown with fire emoji",
+        "Lessons completed count accurate",
+        "Achievements displayed as badge grid (locked badges grayed out)",
+        "Progress by route shows percentage bars for Trading and Finanzas",
+        "Learning history shows last 10 completed lessons with titles and dates",
+        "Privacy: all data private, not visible to other users (except opt-in ranking)"
+      ],
+      "testSteps": [
+        "Navigate to /profile",
+        "Verify display name appears",
+        "Verify total XP matches database",
+        "Verify current streak matches DailyStreak table",
+        "Verify lessons completed count matches UserProgress (status = completed)",
+        "Verify achievements grid shows unlocked badges",
+        "Verify progress bars show correct percentages",
+        "Verify learning history shows recent lessons",
+        "Test on mobile and desktop"
+      ],
+      "states": {
+        "loading": "Skeleton loader for all sections",
+        "empty": "Completa tu primera lección para empezar (if no progress)",
+        "success": "All stats displayed",
+        "error": "No se pudo cargar tu perfil. Intenta de nuevo. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "User ID",
+          "rule": "Must be authenticated",
+          "errorMessage": "Redirect to /login"
+        }
+      ]
+    },
+    {
+      "id": "F010",
+      "name": "Rankings - Global Top 10 & Local Top 3",
+      "category": "secondary",
+      "priority": "P1",
+      "day": 4,
+      "status": "pending",
+      "route": "/ranking",
+      "description": "The Rankings screen shows the Top 10 global users and Top 3 users from the user's country, based on valid XP (anti-farming rules applied). Only display_name and XP are shown, maintaining privacy. Users see their own rank if they're in the top positions.",
+      "acceptanceCriteria": [
+        "Rankings page loads in under 2 seconds",
+        "Global tab shows Top 10 users by XP",
+        "Local tab shows Top 3 users from user's country",
+        "Each row shows: rank (#1, #2, etc.), display_name, total XP",
+        "User's own rank highlighted if in top positions",
+        "If user not in top 10/3: show encouragement message",
+        "Country flags displayed in Local tab",
+        "Rankings cached and updated daily (not real-time)",
+        "Privacy: only display_name and XP shown, no personal data",
+        "Empty state: 'Aún no hay rankings. ¡Sé el primero!'"
+      ],
+      "testSteps": [
+        "Navigate to /ranking",
+        "Verify Global tab shows Top 10",
+        "Verify each user has rank, display_name, XP",
+        "Click 'Mi País' tab",
+        "Verify Top 3 from user's country shown",
+        "Verify country flag appears",
+        "If test user in top 10/3, verify highlighted",
+        "If test user not in top, verify encouragement message",
+        "Test with empty database (no rankings yet)"
+      ],
+      "states": {
+        "loading": "Skeleton loader for ranking table",
+        "empty": "Aún no hay rankings. ¡Sé el primero!",
+        "success": "Rankings displayed",
+        "error": "No se pudieron cargar los rankings. Intenta de nuevo. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "Country code",
+          "rule": "Must be set in user profile",
+          "errorMessage": "Configura tu país en Perfil para ver el ranking local"
+        }
+      ]
+    },
+    {
+      "id": "F011",
+      "name": "Learning Routes - Trading & Finanzas Paths",
+      "category": "core",
+      "priority": "P1",
+      "day": 4,
+      "status": "pending",
+      "route": "/routes",
+      "description": "Users can view and select between two structured learning routes: Trading (20 levels) and Educación Financiera (20 levels). Each route shows levels, locked/unlocked lessons, progress percentage, and next lesson to complete.",
+      "acceptanceCriteria": [
+        "Routes page shows two cards: Trading and Educación Financiera",
+        "Each card displays: title, description, progress percentage",
+        "Active route highlighted (based on preferred_track)",
+        "Clicking card shows route detail view",
+        "Route detail shows all 20 levels",
+        "Levels display locked/unlocked status (based on prerequisites)",
+        "Unlocked levels clickable, locked levels grayed out",
+        "Clicking unlocked level shows lessons in that level",
+        "Lessons display: title, estimated time, completed/in-progress/locked status",
+        "Clicking unlocked lesson navigates to /lesson/[slug]",
+        "User can switch active route (updates preferred_track)"
+      ],
+      "testSteps": [
+        "Navigate to /routes",
+        "Verify two route cards appear",
+        "Verify active route highlighted",
+        "Click Trading route",
+        "Verify 20 levels listed",
+        "Verify Level 1 unlocked, Level 2+ locked (for new user)",
+        "Click Level 1",
+        "Verify lessons in Level 1 shown",
+        "Click first lesson",
+        "Verify navigates to /lesson/[slug]",
+        "Go back, switch to Finanzas route",
+        "Verify preferred_track updated"
+      ],
+      "states": {
+        "loading": "Skeleton loader for route cards and levels",
+        "empty": "N/A (routes always exist)",
+        "success": "Routes and levels displayed",
+        "error": "No se pudieron cargar las rutas. Intenta de nuevo. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "Route selection",
+          "rule": "Must select one route",
+          "errorMessage": "Selecciona una ruta para continuar"
+        }
+      ]
+    },
+    {
+      "id": "F012",
+      "name": "Achievements & Badges System",
+      "category": "secondary",
+      "priority": "P2",
+      "day": 4,
+      "status": "pending",
+      "route": "/profile (achievements section)",
+      "description": "Users unlock achievements by reaching milestones: completing first lesson, reaching 3-day streak, completing a level, getting perfect quiz score, etc. Achievements award XP and display as badges in the user's profile.",
+      "acceptanceCriteria": [
+        "Achievements trigger automatically when criteria met",
+        "Achievement modal displays: title, description, badge icon, XP reward",
+        "XP reward added to user's total XP",
+        "UserAchievement record created with unlocked_at timestamp",
+        "Badge appears in profile achievements grid",
+        "Locked badges shown as grayed out silhouettes (if not is_hidden)",
+        "Hidden achievements don't appear until unlocked",
+        "Multiple achievements can unlock simultaneously (show queue)",
+        "Achievement criteria: first_lesson, streak_3, streak_7, level_up, perfect_score, lessons_10, lessons_50"
+      ],
+      "testSteps": [
+        "Complete first lesson",
+        "Verify achievement modal appears: '¡Primera Lección!'",
+        "Verify XP reward added",
+        "Navigate to /profile",
+        "Verify badge appears in achievements grid",
+        "Complete 3 lessons on consecutive days",
+        "Verify 'Racha de 3 Días' achievement unlocks",
+        "Get 100% on a quiz",
+        "Verify 'Quiz Perfecto' achievement unlocks"
+      ],
+      "states": {
+        "loading": "N/A (achievements trigger in background)",
+        "empty": "All badges grayed out (locked) in profile",
+        "success": "Achievement modal appears, badge unlocked",
+        "error": "If achievement fails to save, retry silently in background"
+      },
+      "validationRules": [
+        {
+          "field": "Achievement criteria",
+          "rule": "Must meet requirement_type and requirement_value",
+          "errorMessage": "N/A (automatic)"
+        }
+      ]
+    },
+    {
+      "id": "F013",
+      "name": "Subscription Tiers - FREE vs PRO",
+      "category": "core",
+      "priority": "P1",
+      "day": 5,
+      "status": "pending",
+      "route": "/upgrade",
+      "description": "Users can view subscription tiers and upgrade from FREE to PRO. FREE: 1 lesson/day, 1 spin, ads after lesson. PRO: unlimited lessons, 3 spins, no ads, streak freezes. Soft upsell after completing daily lesson (FREE users).",
+      "acceptanceCriteria": [
+        "Upgrade page shows clear comparison: FREE vs PRO",
+        "Benefits listed: lessons/day, spins, ads, features",
+        "Pricing displayed (e.g., $4.99/month or local equivalent)",
+        "'Upgrade to PRO' button triggers payment flow",
+        "Payment modal shows price and confirmation",
+        "Successful payment updates subscription_tier to 'pro'",
+        "Confirmation screen shows 'Welcome to PRO' message",
+        "User immediately gains PRO benefits (unlimited lessons, no ads)",
+        "Soft upsell appears for FREE users after completing daily lesson",
+        "Upsell is non-intrusive, dismissable"
+      ],
+      "testSteps": [
+        "Log in as FREE user",
+        "Navigate to /upgrade",
+        "Verify comparison table shows FREE vs PRO",
+        "Click 'Upgrade to PRO'",
+        "Verify payment modal appears (use test mode)",
+        "Enter test payment details",
+        "Confirm payment",
+        "Verify subscription_tier updated to 'pro'",
+        "Navigate to /home",
+        "Verify 'Siguiente lección' available (no 1/day limit)",
+        "Complete lesson",
+        "Verify no ad shown"
+      ],
+      "states": {
+        "loading": "Procesando pago... (while payment processes)",
+        "empty": "N/A",
+        "success": "¡Bienvenido a PRO! (confirmation)",
+        "error": "No se pudo procesar el pago. Intenta de nuevo. (with retry button)"
+      },
+      "validationRules": [
+        {
+          "field": "Payment details",
+          "rule": "Valid card, sufficient funds",
+          "errorMessage": "Pago rechazado. Verifica tus datos."
+        }
+      ]
+    },
+    {
+      "id": "F014",
+      "name": "Offline Mode - Save Progress Locally",
+      "category": "secondary",
+      "priority": "P2",
+      "day": 5,
+      "status": "pending",
+      "route": "All routes",
+      "description": "Users can continue learning even when offline. Lesson progress, quiz answers, and rewards are saved to localStorage and synced when the user reconnects to the internet. This ensures no progress is lost due to network issues.",
+      "acceptanceCriteria": [
+        "Offline state detected automatically (navigator.onLine)",
+        "'Modo sin conexión' indicator appears when offline",
+        "Lesson progress saved to localStorage: cards_viewed, quiz_answers, time_spent",
+        "Quiz can be completed offline (feedback shown from cached data)",
+        "Completion screen shows 'Se sincronizará cuando te conectes'",
+        "Online state triggers automatic sync",
+        "Sync uploads all cached progress to Supabase",
+        "Streak protected: if lesson completed offline on correct day, streak counts",
+        "Sync confirmation shown: 'Progreso sincronizado'",
+        "localStorage cleared after successful sync",
+        "If sync fails, retry automatically (max 3 attempts)"
+      ],
+      "testSteps": [
+        "Start lesson while online",
+        "Turn off internet (airplane mode or disable WiFi)",
+        "Verify 'Modo sin conexión' indicator appears",
+        "Continue lesson, view cards",
+        "Answer quiz questions",
+        "Complete lesson",
+        "Verify 'Se sincronizará cuando te conectes' message",
+        "Turn internet back on",
+        "Verify sync triggers automatically",
+        "Verify UserProgress updated in database",
+        "Verify streak updated",
+        "Verify localStorage cleared"
+      ],
+      "states": {
+        "loading": "Sincronizando progreso... (during sync)",
+        "empty": "N/A",
+        "success": "Progreso sincronizado (confirmation)",
+        "error": "No se pudo sincronizar. Reintentando... (with auto-retry)"
+      },
+      "validationRules": [
+        {
+          "field": "Sync data",
+          "rule": "Must be valid JSON in localStorage",
+          "errorMessage": "Datos corruptos. Contacta soporte."
+        }
+      ]
+    },
+    {
+      "id": "F015",
+      "name": "Error States & Retry Logic",
+      "category": "core",
+      "priority": "P0",
+      "day": 5,
+      "status": "pending",
+      "route": "All routes",
+      "description": "All user actions have graceful error handling with clear messages and retry options. No error breaks the user's habit or causes data loss. Network errors show 'Connection lost. Retry?' with button. Validation errors are inline and specific.",
+      "acceptanceCriteria": [
+        "All fetch/API calls wrapped in try/catch",
+        "Network errors show: message + 'Reintentar' button",
+        "Validation errors show inline per field (red text, icon)",
+        "Server errors (500) show: message + 'Reintentar' button",
+        "404 errors show: 'Página no encontrada' + link to /home",
+        "401 errors redirect to /login with message: 'Por favor inicia sesión'",
+        "403 errors show: 'No tienes permiso para esto'",
+        "Retry button triggers same action again",
+        "Max 3 auto-retries for critical actions (save progress, sync)",
+        "User progress never lost due to errors (saved to localStorage)",
+        "Loading states prevent double-submission"
+      ],
+      "testSteps": [
+        "Disconnect internet",
+        "Try to submit quiz",
+        "Verify network error message appears",
+        "Verify 'Reintentar' button present",
+        "Reconnect internet",
+        "Click 'Reintentar'",
+        "Verify quiz submitted successfully",
+        "Test validation error (submit empty form)",
+        "Verify inline errors appear per field",
+        "Test server error (mock 500 response)",
+        "Verify 'Algo salió mal' message + 'Reintentar'"
+      ],
+      "states": {
+        "loading": "Intentando de nuevo... (during retry)",
+        "empty": "N/A",
+        "success": "Action completes, error cleared",
+        "error": "Error message displayed with retry option"
+      },
+      "validationRules": [
+        {
+          "field": "Network",
+          "rule": "Online required for sync",
+          "errorMessage": "Sin conexión. Verifica tu internet."
+        },
+        {
+          "field": "Server",
+          "rule": "Valid response (200-299)",
+          "errorMessage": "Error del servidor. Intenta de nuevo."
+        }
+      ]
+    }
+  ],
+  "developmentSchedule": {
+    "day1": {
+      "focus": "Foundation & Authentication",
+      "features": ["F001", "F002", "F003"],
+      "deliverable": "Onboarding & auth flows working end-to-end"
+    },
+    "day2": {
+      "focus": "Core Learning Loop",
+      "features": ["F004", "F005", "F006"],
+      "deliverable": "Lesson viewer and quiz working"
+    },
+    "day3": {
+      "focus": "Gamification & Progress Tracking",
+      "features": ["F007", "F008", "F009"],
+      "deliverable": "Completion rewards, spins, and profile working"
+    },
+    "day4": {
+      "focus": "Progression & Social Features",
+      "features": ["F010", "F011", "F012"],
+      "deliverable": "Rankings, routes, and achievements working"
+    },
+    "day5": {
+      "focus": "Monetization, Offline, & Polish",
+      "features": ["F013", "F014", "F015"],
+      "deliverable": "Subscriptions, offline mode, error handling, final polish"
+    }
+  },
+  "successCriteria": {
+    "week1Retention": "≥40-50 active users on Day 7 (out of 100)",
+    "streaks": "Average ≥3 days, multiple users reach 5-7 days",
+    "completion": "≥70% of active users complete daily lesson",
+    "progress": "Users complete 5-10 lessons in first week",
+    "gamification": "High daily spin usage",
+    "conversion": "5-10% upgrade to PRO in first week",
+    "feedback": "'It's easy to keep up', 'I finally understand', 'I want to come back tomorrow'",
+    "loadTime": "App loads in <3 seconds (desktop), <5 seconds (mobile)",
+    "uptime": "≥99.5%",
+    "qualityAssurance": {
+      "buildPasses": "npm run build passes with 0 errors",
+      "lintPasses": "npm run lint passes with 0 errors",
+      "typesSafe": "No `any` types, all interfaces defined",
+      "errorRate": "<1% of user actions result in errors"
+    }
+  }
+}
