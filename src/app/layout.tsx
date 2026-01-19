@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from 'next';
+import { Providers } from './providers';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import './globals.css';
 
 export const viewport: Viewport = {
@@ -35,7 +37,20 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
+  // Fetch initial session server-side
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  const user = session?.user ?? null;
+
+  if (sessionError) {
+    console.error('Session error:', sessionError);
+  }
+
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
@@ -49,7 +64,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         />
       </head>
       <body>
-        <main className="min-h-screen bg-background">{children}</main>
+        <Providers session={session} user={user}>
+          <main className="min-h-screen bg-background">{children}</main>
+        </Providers>
       </body>
     </html>
   );
