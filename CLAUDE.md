@@ -345,30 +345,34 @@ Progress tracked in [docs/progress.md](docs/progress.md)
 ## Rules
 
 ### Before Writing Code
-1. **Read context files:** Always read [CLAUDE.md](CLAUDE.md) and [docs/progress.md](docs/progress.md) before starting
-2. **Explain your plan:** For changes over 20 lines, explain approach before writing code
-3. **Check existing components:** Search `/components` before creating new components
-4. **Understand the data model:** Review tables above and match field names exactly
+1. **Read context files:** Always read [CLAUDE.md](CLAUDE.md), [Styleguide.md](Styleguide.md), and [docs/progress.md](docs/progress.md) before starting
+2. **Review design system:** Familiarize yourself with colors, typography, and component templates
+3. **Explain your plan:** For changes over 20 lines, explain approach before writing code
+4. **Check existing components:** Search `/components` before creating new components
+5. **Understand the data model:** Review tables above and match field names exactly
 
 ### While Writing Code
-5. **One feature at a time:** Finish current feature completely before starting next
-6. **Follow data model exactly:** Use field names and types from tables above
-7. **Handle all states:** Every user action needs loading, success, error states
-8. **Mobile-first:** Design for 320px first, then scale to 1280px+
-9. **Use TypeScript strictly:** No `any` types, define all interfaces
-10. **Follow Next.js 14 patterns:** Use Server Components by default, Client Components only when needed
-11. **Use Tailwind consistently:** No inline styles, use Tailwind utility classes
-12. **Protect user progress:** Never lose streak/XP/progress due to errors
-13. **No over-engineering:** Keep it simple, avoid abstractions for single-use code
-14. **Security first:** Validate input, prevent XSS/injection, sanitize data
+6. **One feature at a time:** Finish current feature completely before starting next
+7. **Follow data model exactly:** Use field names and types from tables above
+8. **Handle all states:** Every user action needs loading, success, error states
+9. **Mobile-first:** Design for 320px first, then scale to 1280px+ (see Styleguide breakpoints)
+10. **Use TypeScript strictly:** No `any` types, define all interfaces
+11. **Follow Next.js 14 patterns:** Use Server Components by default, Client Components only when needed
+12. **Follow design system:** Use Styleguide colors, typography, spacing, and component templates
+13. **Use Tailwind consistently:** No inline styles, use Tailwind utility classes
+14. **Protect user progress:** Never lose streak/XP/progress due to errors
+15. **No over-engineering:** Keep it simple, avoid abstractions for single-use code
+16. **Security first:** Validate input, prevent XSS/injection, sanitize data
 
 ### After Writing Code
-15. **Build must pass:** Run `npm run build` — fix all errors
-16. **Lint must pass:** Run `npm run lint` — fix all warnings
-17. **Type-check must pass:** Run `npm run type-check` — fix all type errors
-18. **Test in browser:** Check on mobile (320px) and desktop (1280px)
-19. **Test all states:** Verify loading, success, error, and empty states work
-20. **Update progress:** Always update [docs/progress.md](docs/progress.md) after completing a feature
+17. **Build must pass:** Run `npm run build` — fix all errors
+18. **Lint must pass:** Run `npm run lint` — fix all warnings
+19. **Type-check must pass:** Run `npm run type-check` — fix all type errors
+20. **Design compliance:** Verify all components match Styleguide (colors, spacing, typography, effects)
+21. **Test in browser:** Check on mobile (320px), tablet (768px), and desktop (1280px)
+22. **Test all states:** Verify loading, success, error, and empty states work
+23. **Test accessibility:** Verify focus states, ARIA labels, semantic HTML
+24. **Update progress:** Always update [docs/progress.md](docs/progress.md) after completing a feature
 
 ---
 
@@ -422,21 +426,43 @@ Progress tracked in [docs/progress.md](docs/progress.md)
 
 Before any feature is "done":
 
+**Build & Code Quality:**
 - [ ] `npm run build` passes with no errors
 - [ ] `npm run lint` passes with no warnings
 - [ ] `npm run type-check` passes with no type errors
+- [ ] Uses TypeScript types (no `any`)
+- [ ] Tailwind classes used (no inline styles)
+- [ ] No security vulnerabilities (XSS, injection, etc.)
+- [ ] Follows data model field names exactly
+
+**Responsiveness:**
 - [ ] Works on mobile (320px width)
+- [ ] Works on tablet (768px width)
 - [ ] Works on desktop (1280px width)
+- [ ] Responsive breakpoints use Tailwind `sm`, `md`, `lg`, `xl`
+- [ ] Mobile-first approach (base styles for mobile)
+
+**User Experience:**
 - [ ] Loading state works correctly
 - [ ] Error state shows helpful message
 - [ ] Success state shows clear feedback
 - [ ] Empty state works (if applicable)
 - [ ] Offline behavior tested (if applicable)
 - [ ] User progress is protected (no data loss on errors)
-- [ ] No security vulnerabilities (XSS, injection, etc.)
-- [ ] Follows data model field names exactly
-- [ ] Uses TypeScript types (no `any`)
-- [ ] Tailwind classes used (no inline styles)
+
+**Design System Compliance (Styleguide):**
+- [ ] Uses brand colors from palette (#9ACD32, #1A2942, etc.)
+- [ ] Typography follows scale (Poppins headings, Inter body)
+- [ ] Component spacing uses Tailwind spacing (gap-2, gap-4, gap-6, p-6)
+- [ ] Border radius matches component types (rounded-xl buttons, rounded-2xl cards)
+- [ ] Hover effects applied (scale-105, shadow-glow-green, or bg-hover)
+- [ ] Focus states visible (focus:ring-2 focus:ring-[#9ACD32])
+- [ ] Icons use Lucide React at 20-24px
+- [ ] Follows component templates (buttons, cards, badges, inputs)
+- [ ] No custom CSS (all Tailwind utilities)
+- [ ] No color hardcoding outside Tailwind config
+- [ ] Gamification elements visible (XP, streaks, badges)
+- [ ] Accessibility standards met (ARIA labels, semantic HTML)
 
 ---
 
@@ -534,6 +560,201 @@ Based on latest 2026 best practices:
 
 ---
 
+## Design System (Styleguide)
+
+All UI components must follow the Progressia Design System defined in [Styleguide.md](Styleguide.md). This ensures visual consistency and supports the gamified, dark-themed aesthetic.
+
+### Color Palette
+
+| Purpose | Color | Hex |
+|---------|-------|-----|
+| **Primary** | Lime Green | `#9ACD32` |
+| **Primary Light** | Bright Green | `#7FFF00` |
+| **Accent** | Purple | `#8B5CF6` |
+| **Info** | Blue | `#3B82F6` |
+| **Background** | Dark Navy | `#0A1628` |
+| **Surface** | Dark Blue | `#1A2942` |
+| **Surface Hover** | Lighter Blue | `#243550` |
+| **Border** | Steel Blue | `#2D3F5F` |
+| **Text Primary** | White | `#FFFFFF` |
+| **Text Secondary** | Light Gray | `#94A3B8` |
+| **Text Tertiary** | Muted Gray | `#64748B` |
+| **Success** | Green | `#22C55E` |
+| **Error** | Red | `#EF4444` |
+
+### Typography
+
+| Element | Font | Size Class | Weight | Usage |
+|---------|------|-----------|--------|-------|
+| **Headings (H1)** | Poppins | `text-5xl` | Bold | Page titles |
+| **Headings (H2)** | Poppins | `text-4xl` | Bold | Section headers |
+| **Headings (H3)** | Poppins | `text-2xl` | Semibold | Subsection headers |
+| **Body** | Inter | `text-base` | Regular/Medium | Main content |
+| **Small** | Inter | `text-sm` | Regular | Secondary text |
+| **Caption** | Inter | `text-xs` | Regular | Metadata, timestamps |
+
+**Font Import:**
+```css
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap');
+```
+
+### Layout & Spacing
+
+| Type | Spacing | Example |
+|------|---------|---------|
+| **Tight** | `gap-2 p-2` | Small cards, compact lists |
+| **Normal** | `gap-4 p-4` | Standard spacing |
+| **Relaxed** | `gap-6 p-6` | Large sections |
+| **Cards** | `p-6` | All card components |
+
+### Border Radius
+
+| Component | Radius |
+|-----------|--------|
+| **Buttons** | `rounded-xl` |
+| **Cards** | `rounded-2xl` |
+| **Inputs** | `rounded-lg` |
+| **Badges** | `rounded-full` |
+
+### Shadow & Effects
+
+| Effect | Tailwind | Usage |
+|--------|----------|-------|
+| **Default Shadow** | `shadow-md` | Cards, dropdowns |
+| **Glow (Green)** | `shadow-[0_0_20px_rgba(154,205,50,0.3)]` | Highlights, hover states |
+| **Transition** | `transition-all duration-200` | All interactive elements |
+| **Hover Scale** | `hover:scale-105` | Button/card hover effect |
+
+### Component Templates
+
+**Primary Button:**
+```jsx
+<button className="bg-[#9ACD32] hover:bg-[#7FFF00] text-[#0A1628] font-semibold px-6 py-3 rounded-xl transition-all duration-200 hover:shadow-[0_0_20px_rgba(154,205,50,0.3)]">
+  Action
+</button>
+```
+
+**Card:**
+```jsx
+<div className="bg-[#1A2942] rounded-2xl p-6 border border-[#2D3F5F] hover:bg-[#243550] transition-all duration-200">
+  Content
+</div>
+```
+
+**Badge:**
+```jsx
+<span className="bg-[#9ACD32] text-[#0A1628] text-xs font-semibold px-3 py-1 rounded-full">
+  ⭐ +20 XP
+</span>
+```
+
+**Input Field:**
+```jsx
+<input className="w-full bg-[#1A2942] border border-[#2D3F5F] rounded-lg px-4 py-3 text-white placeholder:text-[#64748B] focus:border-[#9ACD32] focus:ring-2 focus:ring-[#9ACD32]/20" />
+```
+
+**Progress Bar:**
+```jsx
+<div className="w-full bg-[#1A2942] rounded-full h-3">
+  <div className="bg-gradient-to-r from-[#9ACD32] to-[#7FFF00] h-full rounded-full transition-all duration-500" style={{width: '75%'}}></div>
+</div>
+```
+
+### Icons & Emojis
+
+- **Library:** Lucide React (20-24px)
+- **Primary Color:** `text-[#9ACD32]`
+- **Secondary Color:** `text-[#94A3B8]`
+
+**Common Emojis:**
+| Emoji | Usage |
+|-------|-------|
+| 🔥 | Streak/fire motivation |
+| 🏆 | Achievements/rankings |
+| ⭐ | XP rewards |
+| ⚡ | Actions/momentum |
+| 👑 | PRO tier |
+| 💎 | Premium/special |
+
+### Grid Layouts
+
+**Card Grid:**
+```jsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+```
+
+**Container:**
+```jsx
+<div className="max-w-7xl mx-auto px-4">
+```
+
+### Responsive Breakpoints
+
+| Breakpoint | Width | Use Case |
+|-----------|-------|----------|
+| **sm** | 640px | Mobile landscape |
+| **md** | 768px | Tablet |
+| **lg** | 1024px | Desktop |
+| **xl** | 1280px | Large desktop |
+
+### Tailwind Configuration
+
+The project's `tailwind.config.js` should extend with:
+
+```javascript
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#9ACD32',
+        'primary-light': '#7FFF00',
+        background: { primary: '#0A1628', secondary: '#0F1D33' },
+        surface: { DEFAULT: '#1A2942', hover: '#243550' },
+        border: '#2D3F5F',
+      },
+      boxShadow: {
+        'glow-green': '0 0 20px rgba(154, 205, 50, 0.3)',
+      },
+    },
+  },
+}
+```
+
+### Design Principles
+
+1. **Gamification First:** XP, badges, and progress everywhere
+2. **Dark-First Approach:** No light mode needed (dark theme only)
+3. **Mobile-First Design:** Responsive from 640px upwards
+4. **Accessibility:**
+   - Focus states: `focus:ring-2 focus:ring-[#9ACD32]`
+   - Semantic HTML
+   - ARIA labels for interactive elements
+   - Sufficient color contrast
+   - Clear visual hierarchy
+
+### Style Guide Rules
+
+**When Creating Components:**
+
+- ✅ Use Tailwind utility classes exclusively (no inline styles)
+- ✅ Follow component templates from Styleguide.md
+- ✅ Maintain consistent color usage (green for primary actions)
+- ✅ Add hover effects for interactivity (shadow-glow or scale-105)
+- ✅ Use proper typography scale (Poppins for headings, Inter for body)
+- ✅ Include loading and error states with visual feedback
+- ✅ Test on mobile (320px) and desktop (1280px)
+
+**Never:**
+
+- ❌ Mix color schemes (e.g., blue buttons next to green)
+- ❌ Use inline `style=` attributes
+- ❌ Hardcode colors instead of using Tailwind config
+- ❌ Create custom components that diverge from Styleguide
+- ❌ Ignore accessibility (focus states, ARIA labels)
+- ❌ Skip responsive design (always mobile-first)
+
+---
+
 ## Resources
 
 ### Official Documentation
@@ -551,5 +772,10 @@ Based on latest 2026 best practices:
 ---
 
 **Last Updated:** 2026-01-19
-**Version:** 1.0
-**Status:** Ready for Development
+**Version:** 1.1
+**Status:** Ready for Development (with Design System Integration)
+
+## Version History
+
+- **v1.1** (2026-01-19): Integrated Styleguide design system. Added Design System section with colors, typography, spacing, component templates, and design principles. Updated Rules and Quality Checklist to include design system compliance.
+- **v1.0** (2026-01-19): Initial project guidelines and best practices.
