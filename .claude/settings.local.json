@@ -6,7 +6,11 @@
       "Bash(git commit:*)",
       "Bash(npm run type-check:*)",
       "Bash(npm run lint)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(gh pr create:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr view:*)",
+      "Bash(ls:*)"
     ]
   }
 }

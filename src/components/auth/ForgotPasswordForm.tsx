@@ -1,35 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Button, Input } from '@/components/ui';
-import { signInWithEmail } from '@/app/actions/auth';
+import { resetPassword } from '@/app/actions/auth';
 
 interface FormErrors {
   email?: string;
-  password?: string;
   general?: string;
 }
 
-export function LoginForm() {
-  const router = useRouter();
+export function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [successMessage, setSuccessMessage] = useState('');
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [email, setEmail] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error for this field
-    if (errors[name as keyof FormErrors]) {
+    setEmail(e.target.value);
+    // Clear error when user starts typing
+    if (errors.email) {
       setErrors(prev => ({
         ...prev,
-        [name]: undefined,
+        email: undefined,
       }));
     }
   };
@@ -41,23 +33,19 @@ export function LoginForm() {
     setSuccessMessage('');
 
     try {
-      const result = await signInWithEmail({
-        email: formData.email,
-        password: formData.password,
-      });
+      const result = await resetPassword(email);
 
       if (result.error) {
         setErrors({ general: result.error });
       } else {
-        setSuccessMessage('Sign in successful! Redirecting...');
-        // Redirect will happen automatically via middleware
-        setTimeout(() => {
-          router.push('/home');
-        }, 500);
+        setSuccessMessage(
+          'Password reset email sent! Check your inbox for a link to reset your password.'
+        );
+        setEmail('');
       }
     } catch (error) {
       setErrors({ general: 'An unexpected error occurred. Please try again.' });
-      console.error('Login error:', error);
+      console.error('Password reset error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -85,47 +73,29 @@ export function LoginForm() {
         name="email"
         label="Email"
         placeholder="your@email.com"
-        value={formData.email}
+        value={email}
         onChange={handleChange}
         error={errors.email}
-        disabled={isLoading}
+        disabled={isLoading || !!successMessage}
         required
       />
 
-      {/* Password input */}
-      <Input
-        type="password"
-        name="password"
-        label="Password"
-        placeholder="••••••••"
-        value={formData.password}
-        onChange={handleChange}
-        error={errors.password}
-        disabled={isLoading}
-        required
-      />
-
-      {/* Sign in button */}
+      {/* Submit button */}
       <Button
         type="submit"
         variant="primary"
         size="lg"
         fullWidth
         isLoading={isLoading}
-        disabled={isLoading}
+        disabled={isLoading || !!successMessage}
       >
-        {isLoading ? 'Signing in...' : 'Sign in'}
+        {isLoading ? 'Sending...' : 'Send Reset Link'}
       </Button>
 
-      {/* Forgot password link */}
-      <div className="text-center">
-        <Link
-          href="/forgot-password"
-          className="text-sm text-primary-600 hover:text-primary-700 transition-colors"
-        >
-          Forgot your password?
-        </Link>
-      </div>
+      {/* Help text */}
+      <p className="text-xs text-neutral-500 text-center">
+        We&apos;ll send you an email with a link to reset your password.
+      </p>
     </form>
   );
 }

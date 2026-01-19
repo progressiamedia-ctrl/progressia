@@ -58,11 +58,12 @@ CREATE TABLE IF NOT EXISTS public.ranking (
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  -- Insert into user profile
-  INSERT INTO public.user (id, email, auth_provider, language, timezone, subscription_tier)
+  -- Insert into user profile with display_name from auth metadata
+  INSERT INTO public.user (id, email, display_name, auth_provider, language, timezone, subscription_tier)
   VALUES (
     NEW.id,
     NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'display_name', NEW.email::text),
     COALESCE(NEW.raw_app_meta_data->>'provider', 'email'),
     'es',
     'America/Mexico_City',
@@ -90,6 +91,30 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- ============================================================================
+-- Function to automatically update updated_at timestamp
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.update_timestamp()
+RETURNS trigger AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================================
+-- Triggers to maintain updated_at for audit trails
+-- ============================================================================
+DROP TRIGGER IF EXISTS update_user_timestamp ON public.user;
+CREATE TRIGGER update_user_timestamp
+  BEFORE UPDATE ON public.user
+  FOR EACH ROW EXECUTE FUNCTION public.update_timestamp();
+
+DROP TRIGGER IF EXISTS update_streak_timestamp ON public.daily_streak;
+CREATE TRIGGER update_streak_timestamp
+  BEFORE UPDATE ON public.daily_streak
+  FOR EACH ROW EXECUTE FUNCTION public.update_timestamp();
+
+-- ============================================================================
 -- Enable Row Level Security
 -- ============================================================================
 ALTER TABLE public.user ENABLE ROW LEVEL SECURITY;
@@ -107,7 +132,15 @@ CREATE POLICY "Users can view own profile"
 DROP POLICY IF EXISTS "Users can update own profile" ON public.user;
 CREATE POLICY "Users can update own profile"
   ON public.user FOR UPDATE
-  USING (auth.uid() = id);
+  USING (auth.uid() = id)
+  WITH CHECK (
+    -- Users can only update their own profile
+    auth.uid() = id
+    -- Prevent self-upgrade to pro tier (subscription_tier managed by system only)
+    AND subscription_tier = (SELECT subscription_tier FROM public.user WHERE id = auth.uid())
+    -- Prevent toggling is_active (account status managed by system only)
+    AND is_active = (SELECT is_active FROM public.user WHERE id = auth.uid())
+  );
 
 -- ============================================================================
 -- RLS Policies: Daily Streak
@@ -120,10 +153,21 @@ CREATE POLICY "Users can view own streak"
 DROP POLICY IF EXISTS "Users can update own streak" ON public.daily_streak;
 CREATE POLICY "Users can update own streak"
   ON public.daily_streak FOR UPDATE
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = user_id)
+  WITH CHECK (
+    -- Users can only update their own streak
+    auth.uid() = user_id
+    -- Prevent decreasing current_streak (streak cheating prevention)
+    AND current_streak >= (SELECT current_streak FROM public.daily_streak WHERE user_id = auth.uid())
+    -- Prevent decreasing longest_streak (cheating prevention)
+    AND longest_streak >= (SELECT longest_streak FROM public.daily_streak WHERE user_id = auth.uid())
+  );
 
 -- ============================================================================
 -- RLS Policies: Ranking (public for leaderboard)
+-- NOTE: Ranking leaderboard is GLOBAL across all users (no multi-tenancy)
+-- All authenticated users can view all rankings for the public leaderboard
+-- Ranking updates are managed by system only (no direct user writes)
 -- ============================================================================
 DROP POLICY IF EXISTS "Users can view own ranking" ON public.ranking;
 CREATE POLICY "Users can view own ranking"
@@ -134,6 +178,9 @@ DROP POLICY IF EXISTS "Users can view all rankings" ON public.ranking;
 CREATE POLICY "Users can view all rankings (for leaderboard)"
   ON public.ranking FOR SELECT
   USING (true);
+
+-- Note: Ranking table has no UPDATE or DELETE policies for users
+-- Rankings are recalculated and updated by backend jobs only
 
 -- ============================================================================
 -- Create Indexes for Performance

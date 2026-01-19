@@ -26,6 +26,9 @@ export async function GET(request: NextRequest) {
 
   // Exchange authorization code for session
   if (code) {
+    // Create redirect response that will be returned with cookies
+    let authResponse = NextResponse.redirect(new URL('/home', request.url));
+
     const supabase = createServerClient(
       process.env['NEXT_PUBLIC_SUPABASE_URL'] || '',
       process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || '',
@@ -41,11 +44,10 @@ export async function GET(request: NextRequest) {
               options?: Record<string, unknown>;
             }>
           ) {
-            const response = NextResponse.next();
+            // Set cookies on the authResponse that will be returned
             cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options as Record<string, unknown>);
+              authResponse.cookies.set(name, value, options as Record<string, unknown>);
             });
-            return response;
           },
         },
       }
@@ -61,8 +63,8 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // Successful OAuth sign in - redirect to home
-      return NextResponse.redirect(new URL('/home', request.url));
+      // Return the response with cookies set
+      return authResponse;
     } catch (err) {
       console.error('OAuth callback error:', err);
       return NextResponse.redirect(
