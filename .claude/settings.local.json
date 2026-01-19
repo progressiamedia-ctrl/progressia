@@ -10,7 +10,8 @@
       "Bash(gh pr create:*)",
       "Bash(git push:*)",
       "Bash(gh pr view:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(gh pr comment:*)"
     ]
   }
 }

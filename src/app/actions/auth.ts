@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { validateEmail, validatePassword, validatePasswordMatch } from '@/lib/utils/validation';
+import { validateEmail, validatePassword, validatePasswordMatch, validateDisplayName } from '@/lib/utils/validation';
 
 /**
  * Server Actions for authentication.
@@ -14,37 +14,6 @@ interface SignUpWithEmailInput {
   password: string;
   confirmPassword: string;
   displayName?: string;
-}
-
-/**
- * Validate and sanitize display name
- * @param displayName - The display name to validate
- * @returns Validation result with error or sanitized name
- */
-function validateDisplayName(displayName?: string): { isValid: boolean; error?: string; value?: string } {
-  if (!displayName || displayName.trim().length === 0) {
-    return { isValid: true, value: undefined }; // Optional, can be empty
-  }
-
-  const trimmed = displayName.trim();
-
-  // Check length (max 50 characters for display name)
-  if (trimmed.length > 50) {
-    return { isValid: false, error: 'Display name must be 50 characters or less' };
-  }
-
-  // Check minimum length (at least 2 characters if provided)
-  if (trimmed.length < 2) {
-    return { isValid: false, error: 'Display name must be at least 2 characters' };
-  }
-
-  // Allow alphanumeric, spaces, hyphens, underscores, periods
-  // Prevent special characters that could cause issues
-  if (!/^[a-zA-Z0-9\s\-_.áéíóúñÁÉÍÓÚÑ]+$/.test(trimmed)) {
-    return { isValid: false, error: 'Display name contains invalid characters' };
-  }
-
-  return { isValid: true, value: trimmed };
 }
 
 interface SignInWithEmailInput {
@@ -78,23 +47,25 @@ export async function signUpWithEmail({
       return { error: passwordMatchValidation.error };
     }
 
-    // Validate and sanitize display name
-    const displayNameValidation = validateDisplayName(displayName);
-    if (!displayNameValidation.isValid) {
-      return { error: displayNameValidation.error };
+    // Validate display name (optional)
+    if (displayName) {
+      const displayNameValidation = validateDisplayName(displayName);
+      if (!displayNameValidation.isValid) {
+        return { error: displayNameValidation.error };
+      }
     }
 
     // Create Supabase client
     const supabase = await createSupabaseServerClient();
 
     // Sign up with Supabase Auth
-    // Pass validated display_name in raw_user_meta_data so database trigger can use it
+    // Pass display_name in raw_user_meta_data so database trigger can use it
     const { data, error } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
       password,
       options: {
         data: {
-          display_name: displayNameValidation.value || email.split('@')[0],
+          display_name: displayName?.trim() || email.split('@')[0],
         },
       },
     });
@@ -205,7 +176,7 @@ export async function resetPassword(email: string) {
     const supabase = await createSupabaseServerClient();
 
     const { error } = await supabase.auth.resetPasswordForEmail(email.toLowerCase().trim(), {
-      redirectTo: `${process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000'}/auth/reset-password`,
+      redirectTo: `${process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000'}/reset-password`,
     });
 
     if (error) {

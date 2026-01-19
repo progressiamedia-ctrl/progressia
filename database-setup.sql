@@ -136,6 +136,9 @@ CREATE POLICY "Users can update own profile"
   WITH CHECK (
     -- Users can only update their own profile
     auth.uid() = id
+    -- Lock immutable fields: prevent changes to email and auth_provider
+    AND email = (SELECT email FROM public.user WHERE id = auth.uid())
+    AND auth_provider = (SELECT auth_provider FROM public.user WHERE id = auth.uid())
     -- Prevent self-upgrade to pro tier (subscription_tier managed by system only)
     AND subscription_tier = (SELECT subscription_tier FROM public.user WHERE id = auth.uid())
     -- Prevent toggling is_active (account status managed by system only)
@@ -150,18 +153,16 @@ CREATE POLICY "Users can view own streak"
   ON public.daily_streak FOR SELECT
   USING (auth.uid() = user_id);
 
+-- NOTE: Users do NOT have direct UPDATE access to daily_streak
+-- Streak updates are performed by backend jobs only (via service role)
+-- This prevents users from arbitrarily increasing or modifying streak values
+-- Leaderboard integrity depends on streaks being managed server-side only
+
 DROP POLICY IF EXISTS "Users can update own streak" ON public.daily_streak;
-CREATE POLICY "Users can update own streak"
+-- Deny all user updates - streaks managed by backend only
+CREATE POLICY "Users cannot update streak (backend only)"
   ON public.daily_streak FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (
-    -- Users can only update their own streak
-    auth.uid() = user_id
-    -- Prevent decreasing current_streak (streak cheating prevention)
-    AND current_streak >= (SELECT current_streak FROM public.daily_streak WHERE user_id = auth.uid())
-    -- Prevent decreasing longest_streak (cheating prevention)
-    AND longest_streak >= (SELECT longest_streak FROM public.daily_streak WHERE user_id = auth.uid())
-  );
+  USING (false);  -- Always deny UPDATE access to authenticated users
 
 -- ============================================================================
 -- RLS Policies: Ranking (public for leaderboard)

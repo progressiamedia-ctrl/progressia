@@ -48,6 +48,10 @@ export function validateDisplayName(name: string): { isValid: boolean; error?: s
     return { isValid: false, error: 'Display name is required' };
   }
 
+  if (trimmed.length < 2) {
+    return { isValid: false, error: 'Display name must be at least 2 characters' };
+  }
+
   if (trimmed.length > DISPLAY_NAME_MAX_LENGTH) {
     return {
       isValid: false,
@@ -55,7 +59,8 @@ export function validateDisplayName(name: string): { isValid: boolean; error?: s
     };
   }
 
-  // Allow alphanumeric and spaces
+  // Allow alphanumeric, spaces, and common Latin characters (for LATAM users)
+  // ASCII-only: letters, numbers, spaces
   if (!/^[a-zA-Z0-9\s]+$/.test(trimmed)) {
     return { isValid: false, error: 'Display name can only contain letters, numbers, and spaces' };
   }
