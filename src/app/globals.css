@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-on-background antialiased;
+  }
+
+  h1 {
+    @apply text-3xl font-bold tracking-tight;
+  }
+
+  h2 {
+    @apply text-2xl font-bold tracking-tight;
+  }
+
+  h3 {
+    @apply text-xl font-semibold;
+  }
+
+  h4 {
+    @apply text-lg font-semibold;
+  }
+
+  p {
+    @apply text-base text-on-background/90;
+  }
+
+  a {
+    @apply text-primary-600 hover:text-primary-700 transition-colors;
+  }
+
+  button {
+    @apply transition-colors;
+  }
+}
+
+@layer components {
+  /* Container */
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Text utilities */
+  .text-display-lg {
+    @apply text-4xl font-bold leading-tight tracking-tight;
+  }
+
+  .text-display-md {
+    @apply text-3xl font-bold leading-tight tracking-tight;
+  }
+
+  .text-display-sm {
+    @apply text-2xl font-bold leading-tight;
+  }
+
+  .text-headline-lg {
+    @apply text-xl font-bold;
+  }
+
+  .text-headline-md {
+    @apply text-lg font-bold;
+  }
+
+  .text-headline-sm {
+    @apply text-base font-bold;
+  }
+
+  /* Utility classes for common patterns */
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  .focus-ring {
+    @apply outline-none ring-2 ring-offset-2 ring-primary-500;
+  }
+
+  .transition-smooth {
+    @apply transition-all duration-200 ease-smooth;
+  }
+
+  /* Loading skeleton placeholder */
+  .skeleton {
+    @apply bg-neutral-200 animate-pulse rounded;
+  }
+
+  .skeleton-text {
+    @apply skeleton h-4 w-full;
+  }
+
+  .skeleton-avatar {
+    @apply skeleton h-10 w-10 rounded-full;
+  }
+}
+
+/* Smooth scrolling behavior */
+@supports (scroll-behavior: smooth) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Prevent layout shift during loading */
+html {
+  scroll-behavior: smooth;
+  overflow-y: scroll;
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  html {
+    font-size: 16px; /* Prevent auto-zoom on input focus in Safari */
+  }
+}
+
+/* Dark mode support (optional, for future use) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Print styles */
+@media print {
+  * {
+    @apply !shadow-none !ring-0;
+  }
+
+  body {
+    @apply bg-white;
+  }
+}
