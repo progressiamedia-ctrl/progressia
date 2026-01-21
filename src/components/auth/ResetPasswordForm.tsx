@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button, Input } from '@/components/ui';
-import { validatePassword, validatePasswordMatch } from '@/lib/utils/validation';
-import { createClient } from '@/lib/supabase/client';
+import { updatePassword } from '@/app/actions/auth';
 
 interface FormErrors {
   password?: string;
@@ -50,31 +49,19 @@ export function ResetPasswordForm() {
     e.preventDefault();
     setIsLoading(true);
     setErrors({});
+    setSuccessMessage('');
 
     try {
-      const passwordValidation = validatePassword(formData.password);
-      if (!passwordValidation.isValid) {
-        setErrors({ password: passwordValidation.error });
-        setIsLoading(false);
-        return;
-      }
+      const result = await updatePassword(formData.password, formData.confirmPassword);
 
-      const passwordMatchValidation = validatePasswordMatch(formData.password, formData.confirmPassword);
-      if (!passwordMatchValidation.isValid) {
-        setErrors({ confirmPassword: passwordMatchValidation.error });
-        setIsLoading(false);
-        return;
-      }
-
-      const supabase = createClient();
-      const { error } = await supabase.auth.updateUser({
-        password: formData.password,
-      });
-
-      if (error) {
-        setErrors({ general: error.message || 'Failed to reset password. Please try again.' });
+      if (result.error) {
+        setErrors({ general: result.error });
       } else {
         setSuccessMessage('Password reset successful! Redirecting to login...');
+        setFormData({
+          password: '',
+          confirmPassword: '',
+        });
         setTimeout(() => {
           router.push('/login');
         }, 2000);

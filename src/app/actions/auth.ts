@@ -186,3 +186,66 @@ export async function resetPassword(email: string) {
     return { error: 'Failed to send reset email. Please try again.' };
   }
 }
+
+/**
+ * Update user password (after reset or profile update)
+ */
+export async function updatePassword(password: string, confirmPassword: string) {
+  try {
+    // Validate password strength
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return { error: passwordValidation.error };
+    }
+
+    // Validate passwords match
+    const passwordMatchValidation = validatePasswordMatch(password, confirmPassword);
+    if (!passwordMatchValidation.isValid) {
+      return { error: passwordMatchValidation.error };
+    }
+
+    // Create Supabase client
+    const supabase = await createSupabaseServerClient();
+
+    // Update password
+    const { error } = await supabase.auth.updateUser({
+      password: password.trim(),
+    });
+
+    if (error) {
+      console.error('Password update error:', error);
+      return { error: error.message || 'Failed to update password.' };
+    }
+
+    return { success: true, message: 'Password updated successfully!' };
+  } catch (error) {
+    console.error('Password update error:', error);
+    return { error: 'An unexpected error occurred while updating password.' };
+  }
+}
+
+/**
+ * Sign out current user
+ */
+export async function signOut() {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('Sign out error:', error);
+      return { error: error.message || 'Failed to sign out.' };
+    }
+
+    // Note: redirect() throws NEXT_REDIRECT which should NOT be caught
+    redirect('/login');
+  } catch (error) {
+    // Check if it's a NEXT_REDIRECT (expected)
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error; // Re-throw to allow Next.js to handle
+    }
+    console.error('Sign out error:', error);
+    return { error: 'An unexpected error occurred during sign out.' };
+  }
+}
