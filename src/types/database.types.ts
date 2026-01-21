@@ -26,7 +26,7 @@ export interface Database {
           id: string;
           email: string;
           display_name?: string;
-          auth_provider: 'google' | 'apple' | 'email';
+          auth_provider: 'google' | 'email';
           country_code?: string;
           language: string;
           timezone: string;

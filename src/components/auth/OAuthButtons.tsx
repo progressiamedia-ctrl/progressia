@@ -12,17 +12,17 @@ const getRedirectUri = () => {
 };
 
 export function OAuthButtons() {
-  const [isLoading, setIsLoading] = useState<'google' | 'apple' | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleOAuthSignIn = async (provider: 'google' | 'apple') => {
-    setIsLoading(provider);
+  const handleOAuthSignIn = async () => {
+    setIsLoading(true);
     setError('');
     const supabase = createClient();
 
     try {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: getRedirectUri(),
         },
@@ -32,10 +32,10 @@ export function OAuthButtons() {
         setError(oauthError.message);
       }
     } catch (err) {
-      console.error(`OAuth error for ${provider}:`, err);
-      setError(`Failed to sign in with ${provider}. Please try again.`);
+      console.error('OAuth error:', err);
+      setError('Failed to sign in with Google. Please try again.');
     } finally {
-      setIsLoading(null);
+      setIsLoading(false);
     }
   };
 
@@ -52,12 +52,12 @@ export function OAuthButtons() {
         variant="outline"
         size="lg"
         fullWidth
-        onClick={() => handleOAuthSignIn('google')}
-        isLoading={isLoading === 'google'}
-        disabled={isLoading !== null}
+        onClick={handleOAuthSignIn}
+        isLoading={isLoading}
+        disabled={isLoading}
         className="gap-2"
       >
-        {isLoading === 'google' ? (
+        {isLoading ? (
           'Signing in with Google...'
         ) : (
           <>
@@ -68,29 +68,6 @@ export function OAuthButtons() {
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
             Sign in with Google
-          </>
-        )}
-      </Button>
-
-      <Button
-        type="button"
-        variant="outline"
-        size="lg"
-        fullWidth
-        onClick={() => handleOAuthSignIn('apple')}
-        isLoading={isLoading === 'apple'}
-        disabled={isLoading !== null}
-        className="gap-2"
-      >
-        {isLoading === 'apple' ? (
-          'Signing in with Apple...'
-        ) : (
-          <>
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.05 13.5c-.91 2.92-.37 7.21 3.85 7.74 1.5.19 2.75-.64 3.58-1.89.37-.6.68-1.73 1.49-2.83.39-.5.09-.75-.41-.44-.7.44-1.95 2.6-2.55 1.29-.3-.65-.18-1.73-.55-2.51-.37-.78-.88-1.23-2.37-1.23-1.06 0-2.29.51-3.04.85zm-11.08 1c-.39 0-.72.35-.72.75s.32.75.72.75c.4 0 .72-.35.72-.75s-.32-.75-.72-.75zm3.5-9.08c-.37 0-.75.37-.75.83 0 .45.38.82.75.82.37 0 .75-.37.75-.82 0-.46-.38-.83-.75-.83z" />
-              <path d="M17.08 2.84c.49 0 .93.35 1.03.84.03.15.1.43.17.78.1.56.21 1.17.36 1.59.19.54.58 1.06 1.2 1.06h.3c.6 0 1.09.49 1.09 1.09 0 .6-.49 1.09-1.09 1.09h-.3c-1.38 0-2.38-.73-3.03-2.16-.21-.47-.35-1.1-.47-1.73-.07-.39-.15-.81-.27-1.03-.1-.19-.28-.3-.48-.3h-.3c-.6 0-1.09-.49-1.09-1.09 0-.6.49-1.09 1.09-1.09h.3c.62 0 1.01.52 1.2 1.06.15.42.26 1.03.36 1.59.07.35.14.63.17.78.1.49.54.84 1.03.84z" />
-            </svg>
-            Sign in with Apple
           </>
         )}
       </Button>

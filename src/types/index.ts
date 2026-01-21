@@ -7,7 +7,7 @@ export interface UserProfile {
   id: string;
   email: string;
   displayName?: string;
-  authProvider: 'google' | 'apple' | 'email';
+  authProvider: 'google' | 'email';
   countryCode?: string;
   language: string;
   timezone: string;

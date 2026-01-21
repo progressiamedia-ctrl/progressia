@@ -134,9 +134,9 @@ export async function signInWithEmail({ email, password }: SignInWithEmailInput)
 }
 
 /**
- * Sign in with OAuth provider (Google, Apple)
+ * Sign in with Google OAuth
  */
-export async function signInWithOAuth(provider: 'google' | 'apple') {
+export async function signInWithOAuth(provider: 'google') {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({

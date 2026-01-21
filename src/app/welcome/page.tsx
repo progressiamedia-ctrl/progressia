@@ -116,7 +116,7 @@ export default function WelcomePage() {
               </CardHeader>
               <CardBody className="flex flex-col gap-3">
                 <StepItem title="1. Demo sin fricción" desc="Explora la lección demo sin crear cuenta." />
-                <StepItem title="2. Crea tu cuenta" desc="Usa email o Google/Apple para guardar tu progreso." />
+                <StepItem title="2. Crea tu cuenta" desc="Usa email o Google para guardar tu progreso." />
                 <StepItem title="3. Mantén tu racha" desc="Completa la micro-lección diaria y gana XP + monedas." />
               </CardBody>
             </Card>
