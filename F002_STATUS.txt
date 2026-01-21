@@ -1,0 +1,142 @@
+================================================================================
+                    F002: GOOGLE SIGN-IN — FINAL STATUS
+================================================================================
+
+✅ FEATURE STATUS: COMPLETE
+
+Commit: 024f2f7
+Message: feat(F002): Remove Apple Sign-In, keep only Google OAuth (clean & stable)
+Branch: fix/dev-stability-f001
+
+================================================================================
+DELIVERABLES CHECKLIST
+================================================================================
+
+CLEANUP
+✅ Apple Sign-In button removed (OAuthButtons.tsx)
+✅ Apple provider removed from signInWithOAuth() (auth.ts)
+✅ 'apple' removed from all type unions (database.types.ts, index.ts)
+✅ Welcome page text updated (Google only, not "Google/Apple")
+✅ No dead code, no commented flags, no dangling references
+✅ Build passing: npm run build ✅
+✅ Lint passing: npm run lint ✅  (only console.log warning)
+✅ Types passing: npm run type-check ✅
+
+GOOGLE OAUTH IMPLEMENTATION
+✅ OAuthButtons: Single button, simplified state (isLoading: boolean)
+✅ Callback handler: Client Component ('use client') using useEffect
+✅ Hash-based token parsing: Handles #access_token=... from Supabase
+✅ Session persistence: URL refresh keeps user authenticated
+✅ Error handling: Visible error messages, no silent failures
+✅ Fallback: Missing env vars don't crash app
+
+ROUTES FINAL
+✅ /login → Google OAuth button visible
+✅ /signup → Google OAuth button visible
+✅ /auth/callback → Handles token exchange (Client Component)
+✅ /home → Protected, redirects to /login if no session
+
+VARIABLES REQUIRED (environment)
+- NEXT_PUBLIC_SUPABASE_URL
+- NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+Missing vars: App fails gracefully (shows error or redirects)
+
+================================================================================
+MANUAL VERIFICATION QUICK STEPS
+================================================================================
+
+Test Google Sign-In:
+1. npm run dev
+2. Navigate to http://localhost:3000/login
+3. Click "Sign in with Google"
+4. Authenticate with Google
+5. Should redirect to /home
+6. Refresh page → should stay authenticated
+
+Test UI Cleanup:
+1. Visit /login or /signup
+2. Verify ONLY "Sign in with Google" button (no Apple button)
+3. Verify text says "Google" (not "Google/Apple")
+4. Visit /welcome → Step 2 says "email o Google"
+
+Test Error Handling:
+1. Remove NEXT_PUBLIC_SUPABASE_URL from .env.local
+2. Click Google button → should show error message (not crash)
+
+Test Session Loss:
+1. Sign in with Google (complete flow)
+2. Open /home in new private window (no cookies)
+3. Should redirect to /login
+
+================================================================================
+CODE LOCATIONS
+================================================================================
+
+OAuth Button:
+  src/components/auth/OAuthButtons.tsx
+  - Simplified: one button, no provider union
+  - State: isLoading (boolean, not 'google' | 'apple' | null)
+
+Callback:
+  src/app/auth/callback/page.tsx
+  - Client Component ('use client')
+  - Parses hash, calls getSession(), redirects
+
+Server Auth:
+  src/app/actions/auth.ts
+  - signInWithOAuth(provider: 'google')
+
+Types:
+  src/types/database.types.ts → auth_provider: 'google' | 'email'
+  src/types/index.ts → authProvider: 'google' | 'email'
+
+UI Text:
+  src/app/welcome/page.tsx → "email o Google"
+
+================================================================================
+KNOWN LIMITATIONS / WORKAROUNDS
+================================================================================
+
+Windows Dev Server Webpack Cache:
+  If: "Cannot find module './XXX.js'" appears
+  Fix: rm -r .next && npm run dev
+
+Multiple GoTrueClient Warnings:
+  Origin: Supabase library internals
+  Impact: None (non-blocking, just logging)
+  Action: Safe to ignore
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+✅ F002 (Google OAuth) → COMPLETE
+→  F003 (Email/Password Auth) → Ready to start
+→  F004 (Home Screen) → Blocked by F003
+→  F005 (Lesson Viewer) → Blocked by F004
+→  F006 (Practice Quiz) → Blocked by F005
+
+Current feature state:
+- F001 (Onboarding demo): ✅ Complete, not touched
+- F002 (Google OAuth): ✅ Complete, Apple removed
+- F003 (Email/Password): ⏳ Ready to start
+- F004-F006: 🔒 Awaiting upstream completion
+
+================================================================================
+QA SIGNATURE
+================================================================================
+
+Build:          ✅ No errors
+Lint:           ✅ Passing (1 console.log warning acceptable)
+Types:          ✅ No errors
+Code Review:    ✅ No dead code, no flags, clean
+Testing Doc:    ✅ F002_GOOGLE_OAUTH_CHECKLIST.md created
+UX Impact:      ⚠️  Minimal (button removed, text updated)
+Backward Compat: ⚠️  Breaking (Apple removed, was not live)
+
+Date: 2026-01-21
+Branch: fix/dev-stability-f001
+Status: 🟢 READY FOR INTEGRATION
+
+================================================================================
