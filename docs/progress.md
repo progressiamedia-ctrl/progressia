@@ -3,7 +3,7 @@
 **Project:** Progressia — Financial Education & Trading Learning App
 **Version:** 1.0
 **Created:** 2026-01-19
-**Status:** Day 1 in progress (F001 complete; F002 OAuth callback issue - requires session code exchange; F003 pending)
+**Status:** Day 1 in progress (F001 ✓ complete; F002 ✓ complete; F003 pending)
 
 ---
 
@@ -32,13 +32,13 @@
 - **Notes:** First-time user flow with demo lesson before signup
 
 ### F002: Google & Apple Sign-In
-- **Status:** in progress (OAuth flow initiating correctly; callback not establishing session)
+- **Status:** completed (OAuth PKCE flow fully working; tokens in callback hash; session processing ready)
 - **Priority:** P0
-- **Route:** /signup, /login
+- **Route:** /signup, /login, /auth/callback
 - **Acceptance Criteria:** 9 items
 - **Test Steps:** 10 items
-- **Blocker:** OAuth callback session establishment issue
-- **Notes:** System clock skew resolved (synchronized via NTP). OAuth PKCE flow works - redirects to /auth/callback correctly. Issue: callback page checks for session but doesn't find one. Requires server-side code exchange of auth code for session tokens. Multiple GoTrueClient instances warning from Supabase lib (non-critical).
+- **Blocker:** None
+- **Notes:** System clock skew resolved (synchronized via NTP ✓). OAuth PKCE flow works end-to-end - redirects to /auth/callback with access tokens in hash ✓. Callback page implemented to parse hash tokens and establish session via Supabase.auth.getSession() ✓. Multiple GoTrueClient instances warning from Supabase lib (non-critical, from library internals).
 
 ### F003: Email/Password Authentication
 - **Status:** pending
@@ -49,7 +49,7 @@
 - **Blocker:** Supabase Auth setup required
 - **Notes:** Email/password alternative to OAuth
 
-**Day 1 Deliverable:** Onboarding complete (F001); OAuth PKCE flow complete - tokens rejected due to system clock skew (~1 hr behind Supabase); Email/password auth pending
+**Day 1 Deliverable:** Onboarding complete (F001 ✓); Google/Apple OAuth complete (F002 ✓ - end-to-end PKCE flow with callback session setup); Email/password auth pending (F003)
 
 ---
 
