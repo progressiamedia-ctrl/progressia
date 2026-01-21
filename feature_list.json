@@ -1,0 +1,137 @@
+[
+  {
+    "id": "F001",
+    "name": "User Onboarding (Demo Lesson Before Signup)",
+    "day": 1,
+    "status": "completed",
+    "passes": true,
+    "route": "/welcome",
+    "priority": "P0"
+  },
+  {
+    "id": "F002",
+    "name": "Google & Apple Sign-In",
+    "day": 1,
+    "status": "pending",
+    "passes": false,
+    "route": "/signup,/login",
+    "priority": "P0"
+  },
+  {
+    "id": "F003",
+    "name": "Email/Password Authentication",
+    "day": 1,
+    "status": "pending",
+    "passes": false,
+    "route": "/signup,/login",
+    "priority": "P0"
+  },
+  {
+    "id": "F004",
+    "name": "Home Screen - Today's Lesson",
+    "day": 2,
+    "status": "pending",
+    "passes": false,
+    "route": "/home",
+    "priority": "P0"
+  },
+  {
+    "id": "F005",
+    "name": "Lesson Viewer - Cards & Content",
+    "day": 2,
+    "status": "pending",
+    "passes": false,
+    "route": "/lesson/[slug]",
+    "priority": "P0"
+  },
+  {
+    "id": "F006",
+    "name": "Practice Quiz with Immediate Feedback",
+    "day": 2,
+    "status": "pending",
+    "passes": false,
+    "route": "/lesson/[slug]/practice",
+    "priority": "P0"
+  },
+  {
+    "id": "F007",
+    "name": "Lesson Completion & Rewards",
+    "day": 3,
+    "status": "pending",
+    "passes": false,
+    "route": "/lesson/[slug]/complete",
+    "priority": "P0"
+  },
+  {
+    "id": "F008",
+    "name": "Daily Spin / Ruleta",
+    "day": 3,
+    "status": "pending",
+    "passes": false,
+    "route": "/spin",
+    "priority": "P1"
+  },
+  {
+    "id": "F009",
+    "name": "User Profile & Progress Dashboard",
+    "day": 3,
+    "status": "pending",
+    "passes": false,
+    "route": "/profile",
+    "priority": "P1"
+  },
+  {
+    "id": "F010",
+    "name": "Rankings - Global Top 10 & Local Top 3",
+    "day": 4,
+    "status": "pending",
+    "passes": false,
+    "route": "/ranking",
+    "priority": "P1"
+  },
+  {
+    "id": "F011",
+    "name": "Learning Routes - Trading & Finanzas Paths",
+    "day": 4,
+    "status": "pending",
+    "passes": false,
+    "route": "/routes",
+    "priority": "P1"
+  },
+  {
+    "id": "F012",
+    "name": "Achievements & Badges System",
+    "day": 4,
+    "status": "pending",
+    "passes": false,
+    "route": "/profile",
+    "priority": "P2"
+  },
+  {
+    "id": "F013",
+    "name": "Subscription Tiers - FREE vs PRO",
+    "day": 5,
+    "status": "pending",
+    "passes": false,
+    "route": "/upgrade",
+    "priority": "P1"
+  },
+  {
+    "id": "F014",
+    "name": "Offline Mode - Save Progress Locally",
+    "day": 5,
+    "status": "pending",
+    "passes": false,
+    "route": "all",
+    "priority": "P2"
+  },
+  {
+    "id": "F015",
+    "name": "Error States & Retry Logic",
+    "day": 5,
+    "status": "pending",
+    "passes": false,
+    "route": "all",
+    "priority": "P0"
+  }
+]

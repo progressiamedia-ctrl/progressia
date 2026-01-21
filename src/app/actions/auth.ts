@@ -137,30 +137,26 @@ export async function signInWithEmail({ email, password }: SignInWithEmailInput)
  * Sign in with OAuth provider (Google, Apple)
  */
 export async function signInWithOAuth(provider: 'google' | 'apple') {
-  try {
-    const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000'}/auth/callback`,
-      },
-    });
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${process.env['NEXT_PUBLIC_APP_URL'] || 'http://localhost:3000'}/auth/callback`,
+    },
+  });
 
-    if (error) {
-      console.error(`OAuth error for ${provider}:`, error);
-      return { error: `Failed to sign in with ${provider}. Please try again.` };
-    }
-
-    if (data.url) {
-      redirect(data.url);
-    }
-
-    return { error: 'OAuth redirect failed. Please try again.' };
-  } catch (error) {
-    console.error('OAuth sign in error:', error);
-    return { error: 'An unexpected error occurred during OAuth sign in.' };
+  if (error) {
+    console.error(`OAuth error for ${provider}:`, error);
+    return { error: `Failed to sign in with ${provider}. Please try again.` };
   }
+
+  if (data.url) {
+    // Note: redirect() throws NEXT_REDIRECT which should NOT be caught
+    redirect(data.url);
+  }
+
+  return { error: 'OAuth redirect failed. Please try again.' };
 }
 
 /**

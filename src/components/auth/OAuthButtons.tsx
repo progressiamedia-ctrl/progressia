@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui';
-import { signInWithOAuth } from '@/app/actions/auth';
+import { createClient } from '@/lib/supabase/client';
+
+const getRedirectUri = () => {
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
+  }
+  return process.env['NEXT_PUBLIC_APP_URL']?.replace(/\/$/, '') + '/auth/callback' || 'http://localhost:3000/auth/callback';
+};
 
 export function OAuthButtons() {
   const [isLoading, setIsLoading] = useState<'google' | 'apple' | null>(null);
@@ -11,11 +18,18 @@ export function OAuthButtons() {
   const handleOAuthSignIn = async (provider: 'google' | 'apple') => {
     setIsLoading(provider);
     setError('');
+    const supabase = createClient();
 
     try {
-      const result = await signInWithOAuth(provider);
-      if (result?.error) {
-        setError(result.error);
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: getRedirectUri(),
+        },
+      });
+
+      if (oauthError) {
+        setError(oauthError.message);
       }
     } catch (err) {
       console.error(`OAuth error for ${provider}:`, err);
@@ -28,12 +42,11 @@ export function OAuthButtons() {
   return (
     <div className="flex flex-col gap-3">
       {error && (
-        <div className="p-3 bg-error-50 border border-error-200 rounded-lg">
-          <p className="text-sm text-error-700">{error}</p>
+        <div className="p-3 bg-error/10 border border-error/60 rounded-lg">
+          <p className="text-sm text-text-primary">{error}</p>
         </div>
       )}
 
-      {/* Google OAuth */}
       <Button
         type="button"
         variant="outline"
@@ -59,7 +72,6 @@ export function OAuthButtons() {
         )}
       </Button>
 
-      {/* Apple OAuth */}
       <Button
         type="button"
         variant="outline"
@@ -83,13 +95,12 @@ export function OAuthButtons() {
         )}
       </Button>
 
-      {/* Divider */}
       <div className="relative my-2">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-neutral-300" />
+          <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-neutral-500">or</span>
+          <span className="px-2 bg-surface text-text-secondary">or</span>
         </div>
       </div>
     </div>

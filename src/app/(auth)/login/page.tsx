@@ -10,11 +10,11 @@ export const metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center px-4 py-8">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="min-h-screen bg-gradient-to-b from-background-primary via-background-secondary to-background-primary flex items-center justify-center px-4 py-8">
+      <Card className="w-full max-w-md shadow-md">
         <CardHeader className="text-center">
-          <h1 className="text-2xl font-bold text-neutral-900">Welcome Back</h1>
-          <p className="text-sm text-neutral-600 mt-1">Sign in to continue learning</p>
+          <h1 className="text-2xl font-bold text-text-primary">Welcome Back</h1>
+          <p className="text-sm text-text-secondary mt-1">Sign in to continue learning</p>
         </CardHeader>
 
         <CardBody className="flex flex-col gap-6">
@@ -25,9 +25,9 @@ export default function LoginPage() {
           <LoginForm />
 
           {/* Sign up link */}
-          <div className="text-center text-sm text-neutral-600">
+          <div className="text-center text-sm text-text-secondary">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-primary-600 font-medium hover:text-primary-700">
+            <Link href="/signup" className="text-primary-500 font-medium hover:text-primary-600">
               Sign up
             </Link>
           </div>

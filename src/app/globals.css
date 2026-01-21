@@ -12,19 +12,19 @@
   }
 
   h1 {
-    @apply text-3xl font-bold tracking-tight;
+    @apply text-3xl font-bold tracking-tight font-display;
   }
 
   h2 {
-    @apply text-2xl font-bold tracking-tight;
+    @apply text-2xl font-bold tracking-tight font-display;
   }
 
   h3 {
-    @apply text-xl font-semibold;
+    @apply text-xl font-semibold font-display;
   }
 
   h4 {
-    @apply text-lg font-semibold;
+    @apply text-lg font-semibold font-display;
   }
 
   p {

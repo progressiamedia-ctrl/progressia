@@ -4,7 +4,7 @@
   "description": "Financial education and trading learning platform",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/check-port.js && next dev -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

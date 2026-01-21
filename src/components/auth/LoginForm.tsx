@@ -24,10 +24,9 @@ export function LoginForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error for this field
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: undefined,
       }));
@@ -50,7 +49,6 @@ export function LoginForm() {
         setErrors({ general: result.error });
       } else {
         setSuccessMessage('Sign in successful! Redirecting...');
-        // Redirect will happen automatically via middleware
         setTimeout(() => {
           router.push('/home');
         }, 500);
@@ -65,21 +63,18 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {/* General error message */}
       {errors.general && (
-        <div className="p-3 bg-error-50 border border-error-200 rounded-lg">
-          <p className="text-sm text-error-700">{errors.general}</p>
+        <div className="p-3 bg-error/10 border border-error/60 rounded-lg">
+          <p className="text-sm text-text-primary">{errors.general}</p>
         </div>
       )}
 
-      {/* Success message */}
       {successMessage && (
-        <div className="p-3 bg-success-50 border border-success-200 rounded-lg">
-          <p className="text-sm text-success-700">{successMessage}</p>
+        <div className="p-3 bg-primary-500/10 border border-primary-500/40 rounded-lg">
+          <p className="text-sm text-text-primary">{successMessage}</p>
         </div>
       )}
 
-      {/* Email input */}
       <Input
         type="email"
         name="email"
@@ -92,7 +87,6 @@ export function LoginForm() {
         required
       />
 
-      {/* Password input */}
       <Input
         type="password"
         name="password"
@@ -105,24 +99,12 @@ export function LoginForm() {
         required
       />
 
-      {/* Sign in button */}
-      <Button
-        type="submit"
-        variant="primary"
-        size="lg"
-        fullWidth
-        isLoading={isLoading}
-        disabled={isLoading}
-      >
+      <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading} disabled={isLoading}>
         {isLoading ? 'Signing in...' : 'Sign in'}
       </Button>
 
-      {/* Forgot password link */}
       <div className="text-center">
-        <Link
-          href="/forgot-password"
-          className="text-sm text-primary-600 hover:text-primary-700 transition-colors"
-        >
+        <Link href="/forgot-password" className="text-sm text-primary-500 hover:text-primary-600 transition-colors">
           Forgot your password?
         </Link>
       </div>

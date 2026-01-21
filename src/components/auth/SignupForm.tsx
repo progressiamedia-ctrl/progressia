@@ -26,10 +26,9 @@ export function SignupForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error for this field
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: undefined,
       }));
@@ -54,14 +53,12 @@ export function SignupForm() {
         setErrors({ general: result.error });
       } else {
         setSuccessMessage('Account created! You can now sign in with your email and password.');
-        // Reset form
         setFormData({
           email: '',
           password: '',
           confirmPassword: '',
           displayName: '',
         });
-        // Redirect to login after a short delay
         setTimeout(() => {
           router.push('/login');
         }, 2000);
@@ -76,21 +73,18 @@ export function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {/* General error message */}
       {errors.general && (
-        <div className="p-3 bg-error-50 border border-error-200 rounded-lg">
-          <p className="text-sm text-error-700">{errors.general}</p>
+        <div className="p-3 bg-error/10 border border-error/60 rounded-lg">
+          <p className="text-sm text-text-primary">{errors.general}</p>
         </div>
       )}
 
-      {/* Success message */}
       {successMessage && (
-        <div className="p-3 bg-success-50 border border-success-200 rounded-lg">
-          <p className="text-sm text-success-700">{successMessage}</p>
+        <div className="p-3 bg-primary-500/10 border border-primary-500/40 rounded-lg">
+          <p className="text-sm text-text-primary">{successMessage}</p>
         </div>
       )}
 
-      {/* Email input */}
       <Input
         type="email"
         name="email"
@@ -103,7 +97,6 @@ export function SignupForm() {
         required
       />
 
-      {/* Display name input (optional) */}
       <Input
         type="text"
         name="displayName"
@@ -115,7 +108,6 @@ export function SignupForm() {
         helperText="This will be shown in leaderboards and achievements"
       />
 
-      {/* Password input */}
       <Input
         type="password"
         name="password"
@@ -129,7 +121,6 @@ export function SignupForm() {
         required
       />
 
-      {/* Confirm password input */}
       <Input
         type="password"
         name="confirmPassword"
@@ -142,15 +133,7 @@ export function SignupForm() {
         required
       />
 
-      {/* Sign up button */}
-      <Button
-        type="submit"
-        variant="primary"
-        size="lg"
-        fullWidth
-        isLoading={isLoading}
-        disabled={isLoading}
-      >
+      <Button type="submit" variant="primary" size="lg" fullWidth isLoading={isLoading} disabled={isLoading}>
         {isLoading ? 'Creating account...' : 'Create Account'}
       </Button>
     </form>

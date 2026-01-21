@@ -10,24 +10,47 @@ import { createServerClient } from '@supabase/ssr';
  * - Redirect authenticated users away from auth pages
  */
 
+let missingSupabaseEnvWarningLogged = false;
+
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Protected routes that require authentication
-  const protectedRoutes = ['/home', '/profile', '/lesson', '/routes', '/ranking', '/upgrade', '/spin'];
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-
   // Create response to forward to next middleware/route
-  let response = NextResponse.next({
+  const response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
-  // Create Supabase client to check session
+  // Public routes that should never hit Supabase auth (to avoid hanging requests)
+  const publicRoutes = new Set(['/welcome', '/lesson/demo', '/healthz']);
+  if (publicRoutes.has(pathname)) {
+    return response;
+  }
+
+  if (pathname.startsWith('/_next/data')) {
+    return response;
+  }
+
+  // Protected routes that require authentication (except public demo)
+  const protectedRoutes = ['/home', '/profile', '/lesson', '/routes', '/ranking', '/upgrade', '/spin'];
+  const isDemoRoute = pathname === '/lesson/demo';
+  const isProtectedRoute =
+    !isDemoRoute && protectedRoutes.some(route => pathname.startsWith(route));
+
+  const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL'];
+  const supabaseAnonKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'];
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (!missingSupabaseEnvWarningLogged) {
+      console.warn('Supabase middleware skipped because NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is missing.');
+      missingSupabaseEnvWarningLogged = true;
+    }
+    return response;
+  }
+
   const supabase = createServerClient(
-    process.env['NEXT_PUBLIC_SUPABASE_URL'] || '',
-    process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || '',
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
@@ -78,7 +101,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
+     * - auth/callback (OAuth callback handling)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.svg$).*)',
+    '/((?!_next/static|_next/image|_next/data|favicon.ico|manifest\\.json|icons/.*|robots\\.txt|sitemap\\.xml|auth/callback|.*\\.svg$).*)',
   ],
 };

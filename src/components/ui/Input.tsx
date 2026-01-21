@@ -20,10 +20,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col gap-2">
         {label && (
-          <label
-            htmlFor={inputId}
-            className="text-sm font-medium text-neutral-700"
-          >
+          <label htmlFor={inputId} className="text-sm font-medium text-text-secondary">
             {label}
           </label>
         )}
@@ -35,17 +32,23 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className={`
               w-full
               px-4
-              py-2
+              py-3
               border
               rounded-lg
-              transition-smooth
-              focus-ring
+              transition-all
+              duration-200
               text-base
-              placeholder-neutral-400
-              disabled:bg-neutral-50
-              disabled:text-neutral-500
+              bg-surface
+              text-text-primary
+              placeholder:text-text-tertiary
+              focus-visible:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-primary-500
+              focus-visible:ring-offset-0
+              disabled:bg-surface-hover
+              disabled:text-text-secondary
               disabled:cursor-not-allowed
-              ${error ? 'border-error-500 focus:ring-error-500' : 'border-neutral-300 focus:ring-primary-500'}
+              ${error ? 'border-error focus-visible:ring-error' : 'border-border'}
               ${icon ? 'pl-10' : ''}
               ${className}
             `}
@@ -53,19 +56,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           />
 
           {icon && (
-            <div className="absolute left-3 flex items-center pointer-events-none text-neutral-400">
+            <div className="absolute left-3 flex items-center pointer-events-none text-text-tertiary">
               {icon}
             </div>
           )}
         </div>
 
         {error && (
-          <p className="text-sm font-medium text-error-600 flex items-center gap-1">
-            <svg
-              className="w-4 h-4"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+          <p className="text-sm font-medium text-error flex items-center gap-1">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M18.101 12.93a1 1 0 00-1.414-1.414L10 14.586 3.313 7.899a1 1 0 00-1.414 1.414l7.071 7.071a1 1 0 001.414 0l8.485-8.485z"
@@ -76,11 +75,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           </p>
         )}
 
-        {helperText && !error && (
-          <p className="text-sm text-neutral-500">
-            {helperText}
-          </p>
-        )}
+        {helperText && !error && <p className="text-sm text-text-tertiary">{helperText}</p>}
       </div>
     );
   }
