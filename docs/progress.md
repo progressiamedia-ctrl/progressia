@@ -3,7 +3,7 @@
 **Project:** Progressia — Financial Education & Trading Learning App
 **Version:** 1.0
 **Created:** 2026-01-19
-**Status:** Day 1 in progress (F001 complete; F002 OAuth flow working - blocked by system clock skew; F003 pending)
+**Status:** Day 1 in progress (F001 complete; F002 OAuth callback issue - requires session code exchange; F003 pending)
 
 ---
 
@@ -32,13 +32,13 @@
 - **Notes:** First-time user flow with demo lesson before signup
 
 ### F002: Google & Apple Sign-In
-- **Status:** completed (OAuth flow working; session validation blocked by clock skew)
+- **Status:** in progress (OAuth flow initiating correctly; callback not establishing session)
 - **Priority:** P0
 - **Route:** /signup, /login
 - **Acceptance Criteria:** 9 items
 - **Test Steps:** 10 items
-- **Blocker:** System clock skew (~1 hour mismatch with Supabase)
-- **Notes:** PKCE flow working; Google auth redirects properly to /auth/callback route; tokens generated but JWT validation fails due to time mismatch
+- **Blocker:** OAuth callback session establishment issue
+- **Notes:** System clock skew resolved (synchronized via NTP). OAuth PKCE flow works - redirects to /auth/callback correctly. Issue: callback page checks for session but doesn't find one. Requires server-side code exchange of auth code for session tokens. Multiple GoTrueClient instances warning from Supabase lib (non-critical).
 
 ### F003: Email/Password Authentication
 - **Status:** pending
@@ -335,13 +335,26 @@
 
 ## Known Issues & Workarounds
 
-### Clock Skew Issue (Blocking F002 completion)
-- **Issue:** System time is ~1 hour behind Supabase servers
-- **Impact:** JWT tokens are rejected as "issued in the future" during client-side validation
-- **Status:** Affects OAuth session establishment; PKCE code exchange completes but tokens unusable
-- **Workaround:** Requires system clock sync or Supabase time-skew tolerance configuration
-- **Root Cause:** System/VM clock drift relative to Supabase cloud infrastructure
-- **Timeline:** Blocking completion of user authentication flow
+### Clock Skew Issue (RESOLVED ✅)
+- **Issue:** System time was ~1 hour behind Supabase servers
+- **Status:** FIXED - Synchronized Windows system clock via NTP (w32tm)
+- **Resolution:** Ran PowerShell: `w32tm /resync` with admin privileges
+- **Notes:** JWT "issued in the future" error no longer occurs
+
+### OAuth Callback Session Establishment (Blocking F002 completion)
+- **Issue:** OAuth PKCE flow completes and redirects to /auth/callback, but session isn't established
+- **Impact:** User is redirected back to login instead of to /home after Google/Apple sign-in
+- **Status:** Investigating - callback page checks for session but `getSession()` returns null
+- **Root Cause:** Supabase OAuth flow requires explicit code exchange via `exchangeCodeForSession()` before session is available
+- **Solution Required:** Implement server-side code exchange in callback route handler
+- **Workaround:** None - OAuth cannot complete until this is fixed
+
+### Multiple GoTrueClient Instances (Non-critical Warning)
+- **Issue:** Supabase library creates multiple GoTrueClient instances
+- **Impact:** Console warnings, potential race conditions with concurrent access
+- **Status:** Implemented singleton pattern in `createClient()`, but warning persists
+- **Root Cause:** Warning originates from Supabase library's internal implementation, not our code
+- **Notes:** Non-blocking for now, but may need investigation if session management issues occur
 
 ---
 
