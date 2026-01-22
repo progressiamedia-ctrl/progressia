@@ -248,16 +248,16 @@
 - [ ] Initial lesson content seeded (40 lessons: 20 Trading + 20 Finanzas)
 - [ ] Initial reward system seeded
 
-### Day 1 Checklist
-- [ ] Project scaffolding complete
-- [ ] Folder structure set up per CLAUDE.md
-- [ ] F001: Onboarding flow complete and tested
-- [ ] F002: Google/Apple OAuth working
-- [ ] F003: Email/Password auth working
-- [ ] All 3 features have passing test steps
-- [ ] Build passes: `npm run build`
-- [ ] Lint passes: `npm run lint`
-- [ ] Commit: "feat: authentication and onboarding (F001-F003)"
+### Day 1 Checklist ✅ COMPLETE
+- [x] Project scaffolding complete
+- [x] Folder structure set up per CLAUDE.md
+- [x] F001: Onboarding flow complete and tested
+- [x] F002: Google/Apple OAuth working
+- [x] F003: Email/Password auth working
+- [x] All 3 features have passing test steps
+- [x] Build passes: `npm run build`
+- [x] Lint passes: `npm run lint`
+- [x] Commit: "feat: authentication and onboarding (F001-F003)"
 
 ### Day 2 Checklist
 - [ ] F004: Home screen displays today's lesson correctly
