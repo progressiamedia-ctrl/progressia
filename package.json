@@ -4,22 +4,22 @@
   "description": "Financial education and trading learning platform",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/check-port.js && next dev -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "next": "14.0.0",
-    "@supabase/supabase-js": "^2.38.0",
-    "@supabase/ssr": "^0.0.11",
-    "tailwindcss": "^3.3.0",
-    "stripe": "^14.5.0",
-    "@stripe/react-stripe-js": "^2.4.0",
-    "@stripe/stripe-js": "^1.46.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "next": "^14.2.3",
+    "@supabase/supabase-js": "^2.44.4",
+    "@supabase/ssr": "^0.1.0",
+    "tailwindcss": "^3.4.1",
+    "stripe": "^15.0.0",
+    "@stripe/react-stripe-js": "^2.7.4",
+    "@stripe/stripe-js": "^3.0.4"
   },
   "devDependencies": {
     "typescript": "^5.3.0",
